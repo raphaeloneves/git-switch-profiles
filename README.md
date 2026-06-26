@@ -1,5 +1,10 @@
 # git-switch-profiles
 
+[![npm version](https://img.shields.io/npm/v/git-switch-profiles)](https://www.npmjs.com/package/git-switch-profiles)
+[![npm downloads](https://img.shields.io/npm/dm/git-switch-profiles)](https://www.npmjs.com/package/git-switch-profiles)
+[![license](https://img.shields.io/npm/l/git-switch-profiles)](https://github.com/raphaeloneves/git-switch-profiles/blob/main/LICENSE)
+[![node](https://img.shields.io/node/v/git-switch-profiles)](https://www.npmjs.com/package/git-switch-profiles)
+
 > Painlessly manage and switch between multiple git accounts — work, personal, or any other.
 
 If you've ever had to remember to change your `~/.gitconfig`, juggle SSH keys, and wonder why your personal commits keep showing up under your work email (or worse, the other way around) — this tool is for you.
@@ -19,16 +24,16 @@ npm install -g git-switch-profiles
 ## Quick start
 
 ```bash
-# Add your first profile
+# Add your work profile
 gsp init
 
-# Add another
+# Add your personal profile
 gsp init
 
-# List profiles
+# See all profiles
 gsp list
 
-# Switch
+# Switch — that's it
 gsp work
 gsp personal
 ```
@@ -96,19 +101,27 @@ Only the block between the markers is managed — everything else in your `~/.ss
 
 ## SSH key types
 
-When generating a new key, `gsp` supports:
+When generating a new key during `gsp init`, you can choose:
 
-| Type | Flag | Notes |
-|---|---|---|
-| RSA 4096 | `-t rsa -b 4096` | Default — widest compatibility |
-| Ed25519 | `-t ed25519` | Modern, faster, recommended for new setups |
-| ECDSA 521 | `-t ecdsa -b 521` | Elliptic curve alternative |
+| Type | Notes |
+|---|---|
+| RSA 4096 | Default — widest compatibility |
+| Ed25519 | Modern, faster, recommended for new setups |
+| ECDSA 521 | Elliptic curve alternative |
 
 ---
 
 ## Profile storage
 
-Profiles are stored in `~/.git-switch/profiles.json`. The file is plain JSON — you can inspect or back it up manually at any time.
+Profiles are stored in `~/.git-switch/profiles.json`. Plain JSON — inspect or back it up at any time.
+
+---
+
+## Requirements
+
+- Node.js >= 14
+- `git` and `ssh-keygen` available in your PATH
+- A running `ssh-agent` (standard on macOS and most Linux distros)
 
 ---
 
