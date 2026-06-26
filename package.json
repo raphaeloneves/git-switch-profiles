@@ -1,0 +1,40 @@
+{
+  "name": "git-switch-profiles",
+  "version": "0.1.0",
+  "description": "Manage and switch between multiple git accounts (work, personal, etc.)",
+  "bin": {
+    "gsp": "./bin/gsp.js",
+    "git-switch-profiles": "./bin/gsp.js"
+  },
+  "keywords": [
+    "git",
+    "ssh",
+    "profiles",
+    "accounts",
+    "switch",
+    "multiple accounts"
+  ],
+  "files": [
+    "bin",
+    "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/raphaeloneves/git-switch-profiles.git"
+  },
+  "homepage": "https://github.com/raphaeloneves/git-switch-profiles#readme",
+  "bugs": {
+    "url": "https://github.com/raphaeloneves/git-switch-profiles/issues"
+  },
+  "author": "Raphael Neves",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "inquirer": "^8.2.6",
+    "ora": "^5.4.1"
+  }
+}
