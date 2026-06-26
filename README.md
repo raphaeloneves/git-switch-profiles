@@ -5,11 +5,14 @@
 [![license](https://img.shields.io/npm/l/git-switch-profiles)](https://github.com/raphaeloneves/git-switch-profiles/blob/main/LICENSE)
 [![node](https://img.shields.io/node/v/git-switch-profiles)](https://www.npmjs.com/package/git-switch-profiles)
 
-> Painlessly manage and switch between multiple git accounts — work, personal, or any other.
+Switching between a work and a personal git account is painful. You forget to change your email, push a personal commit under your company name, or spend five minutes figuring out why SSH authentication is broken.
 
-If you've ever had to remember to change your `~/.gitconfig`, juggle SSH keys, and wonder why your personal commits keep showing up under your work email (or worse, the other way around) — this tool is for you.
+**git-switch-profiles** fixes this. One command switches your entire git identity — name, email, and SSH key — and actively blocks the other accounts so nothing leaks through.
 
-`gsp` wraps each git identity into a named profile. One command switches everything: git config, SSH key in the agent, and `~/.ssh/config`. Inactive profiles are actively blocked so the wrong key can never sneak through.
+```bash
+gsp work      # everything switches to your work identity
+gsp personal  # everything switches back
+```
 
 ---
 
@@ -19,109 +22,72 @@ If you've ever had to remember to change your `~/.gitconfig`, juggle SSH keys, a
 npm install -g git-switch-profiles
 ```
 
+**Requirements:** Node.js 14+, `git`, `ssh-keygen`, and a running `ssh-agent` (standard on macOS and most Linux distros).
+
 ---
 
-## Quick start
+## Setting up a profile
 
 ```bash
-# Add your work profile
 gsp init
-
-# Add your personal profile
-gsp init
-
-# See all profiles
-gsp list
-
-# Switch — that's it
-gsp work
-gsp personal
 ```
+
+This walks you through everything interactively:
+
+- A name for the profile (`work`, `personal`, `freelance`, anything)
+- The author name and email that will appear on your commits
+- An SSH key — generate a fresh one or pick an existing key from `~/.ssh/`
+- Which git hosts this profile owns (`github.com`, `gitlab.com`, `bitbucket.org`, or your own)
+
+That's it. Your SSH host keys are trusted automatically so the first push just works.
 
 ---
 
-## Commands
+## Switching profiles
 
-| Command | Alias | Description |
-|---|---|---|
-| `gsp init` | `gsp add` | Add a new profile interactively |
-| `gsp <name>` | `gsp use <name>` | Switch to a profile |
-| `gsp list` | `gsp ls` | List all profiles |
-| `gsp current` | | Show the active profile |
-| `gsp info <name>` | | Show full details for a profile |
-| `gsp edit <name>` | | Edit an existing profile |
-| `gsp remove <name>` | `gsp rm <name>` | Remove a profile |
+```bash
+gsp <name>
+```
+
+Under the hood this does three things atomically:
+
+- Sets `user.name` and `user.email` in your global `~/.gitconfig`
+- Loads the right SSH key into the agent
+- Updates `~/.ssh/config` to route the active profile's hosts to the correct key, and **hard blocks** every other profile's hosts
+
+That last part matters. When you switch to `personal`, your work hosts get `PubkeyAuthentication no` — the wrong key literally cannot authenticate, no matter what's left in the agent or macOS Keychain.
 
 ---
 
-## What `gsp init` sets up
+## All commands
 
-Running `gsp init` walks you through an interactive setup:
-
-- **Profile name** — a short identifier like `work` or `personal`
-- **Author name** — shown in git commits (`user.name`)
-- **Email** — shown in git commits (`user.email`)
-- **SSH key** — generate a new one (RSA 4096, Ed25519, or ECDSA 521) or pick an existing key from `~/.ssh/`
-- **Hosts** — which git hosts this key covers (`github.com`, `gitlab.com`, `bitbucket.org`, or custom)
-
-Host keys are added to `~/.ssh/known_hosts` automatically so your first push never fails with a host verification error.
-
----
-
-## What switching does
-
-Running `gsp work` (or any profile name):
-
-1. Updates `~/.gitconfig` — sets `user.name` and `user.email` globally
-2. Reloads the SSH agent — clears existing keys and loads the profile's key
-3. Rewrites the managed block in `~/.ssh/config`:
-   - Active profile's hosts → routed to the correct identity file
-   - All other profiles' hosts → `PubkeyAuthentication no` (hard blocked)
-
-This means switching to `personal` makes it impossible to accidentally push to a work repo under the wrong identity, and vice versa.
-
-```
-# ~/.ssh/config (managed block, updated on every switch)
-
-# active: personal
-Host github.com
-  HostName github.com
-  User git
-  IdentityFile ~/.ssh/id_ed25519_personal
-  IdentitiesOnly yes
-
-# blocked: work
-Host bitbucket.org
-  PubkeyAuthentication no
-```
-
-Only the block between the markers is managed — everything else in your `~/.ssh/config` is left untouched.
+| Command | Description |
+|---|---|
+| `gsp init` | Add a new profile |
+| `gsp <name>` | Switch to a profile |
+| `gsp list` | See all profiles and which is active |
+| `gsp current` | Show the active profile |
+| `gsp info <name>` | Full details — key path, hosts, status |
+| `gsp edit <name>` | Update a profile |
+| `gsp remove <name>` | Delete a profile |
 
 ---
 
 ## SSH key types
 
-When generating a new key during `gsp init`, you can choose:
+When creating a new key you can choose:
 
 | Type | Notes |
 |---|---|
-| RSA 4096 | Default — widest compatibility |
-| Ed25519 | Modern, faster, recommended for new setups |
-| ECDSA 521 | Elliptic curve alternative |
+| **RSA 4096** | Default. Works everywhere. |
+| **Ed25519** | Modern and faster. Recommended for new setups. |
+| **ECDSA 521** | Elliptic curve alternative. |
 
 ---
 
-## Profile storage
+## Where profiles are stored
 
-Profiles are stored in `~/.git-switch/profiles.json`. Plain JSON — inspect or back it up at any time.
-
----
-
-## Requirements
-
-- Node.js >= 14
-- `git` and `ssh-keygen` available in your PATH
-- A running `ssh-agent` (standard on macOS and most Linux distros)
+`~/.git-switch/profiles.json` — plain JSON, yours to inspect or back up.
 
 ---
 
