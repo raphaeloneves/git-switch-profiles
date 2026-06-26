@@ -50,6 +50,19 @@ class EditCommand {
 
     spin.succeed(`Profile ${this._ui.c.profile(name)} updated${isActive ? ' and re-applied' : ''}`);
 
+    if (updates.sshHosts && updates.sshHosts.length > 0) {
+      const hostSpin = this._ui.spinner('Trusting host keys...');
+      hostSpin.start();
+      const { trusted, failed } = this._ssh.trustHosts(updates.sshHosts);
+      if (failed.length > 0) {
+        hostSpin.warn(`Could not reach: ${failed.join(', ')} — add manually with ssh-keyscan`);
+      } else {
+        hostSpin.succeed(trusted.length > 0
+          ? `Host keys trusted: ${trusted.join(', ')}`
+          : 'Host keys already trusted');
+      }
+    }
+
     if (updates.isNew && updates.sshKeyPath) {
       const pubKey = this._ssh.getPublicKey(updates.sshKeyPath);
       this._ui.publicKeyBox(pubKey, updates.sshHosts);

@@ -41,6 +41,19 @@ class InitCommand {
 
     spin.succeed(`Profile ${this._ui.c.profile(details.name)} created`);
 
+    if (sshData.sshHosts && sshData.sshHosts.length > 0) {
+      const hostSpin = this._ui.spinner('Trusting host keys...');
+      hostSpin.start();
+      const { trusted, failed } = this._ssh.trustHosts(sshData.sshHosts);
+      if (failed.length > 0) {
+        hostSpin.warn(`Could not reach: ${failed.join(', ')} — add manually with ssh-keyscan`);
+      } else {
+        hostSpin.succeed(trusted.length > 0
+          ? `Host keys trusted: ${trusted.join(', ')}`
+          : 'Host keys already trusted');
+      }
+    }
+
     if (sshData.isNew && sshData.sshKeyPath) {
       const pubKey = this._ssh.getPublicKey(sshData.sshKeyPath);
       this._ui.publicKeyBox(pubKey, sshData.sshHosts);

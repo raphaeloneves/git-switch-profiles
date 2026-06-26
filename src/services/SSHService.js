@@ -58,6 +58,33 @@ class SSHService {
     }
   }
 
+  trustHosts(hosts) {
+    const knownHostsPath = path.join(os.homedir(), '.ssh', 'known_hosts');
+    const existing = fs.existsSync(knownHostsPath)
+      ? fs.readFileSync(knownHostsPath, 'utf8')
+      : '';
+
+    const untrusted = hosts.filter((h) => !existing.includes(h));
+    if (untrusted.length === 0) return { trusted: [], failed: [] };
+
+    const trusted = [];
+    const failed = [];
+
+    for (const host of untrusted) {
+      const result = spawnSync('ssh-keyscan', ['-H', '-T', '5', host], {
+        encoding: 'utf8',
+      });
+      if (result.status === 0 && result.stdout.trim()) {
+        fs.appendFileSync(knownHostsPath, result.stdout, { mode: 0o600 });
+        trusted.push(host);
+      } else {
+        failed.push(host);
+      }
+    }
+
+    return { trusted, failed };
+  }
+
   keyExists(keyPath) {
     return fs.existsSync(this._expand(keyPath));
   }
