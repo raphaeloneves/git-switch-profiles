@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "Manage and switch between multiple git accounts (work, personal, etc.)",
   "bin": {
-    "gsp": "./bin/gsp.js",
-    "git-switch-profiles": "./bin/gsp.js"
+    "gsp": "bin/gsp.js",
+    "git-switch-profiles": "bin/gsp.js"
   },
   "keywords": [
     "git",
@@ -20,7 +20,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/raphaeloneves/git-switch-profiles.git"
+    "url": "git+https://github.com/raphaeloneves/git-switch-profiles.git"
   },
   "homepage": "https://github.com/raphaeloneves/git-switch-profiles#readme",
   "bugs": {
