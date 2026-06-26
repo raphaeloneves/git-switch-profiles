@@ -1,6 +1,6 @@
 {
   "name": "git-switch-profiles",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Manage and switch between multiple git accounts (work, personal, etc.)",
   "bin": {
     "gsp": "bin/gsp.js",
